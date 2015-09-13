@@ -9,6 +9,6 @@ cd /usr/share/easy-rsa/
 vagrant provision --provision-with ansible
 
 # source ansible/roles/openvpn/files/server1.conf
-#equal - copy: src=server1.conf dest=/etc/openvpn/server1.conf owner=root group=root mode=0755
+equal - copy: src=server1.conf dest=/etc/openvpn/server1.conf owner=root group=root mode=0755
 
-# change ip in server1.conf
+change ip in server1.conf
