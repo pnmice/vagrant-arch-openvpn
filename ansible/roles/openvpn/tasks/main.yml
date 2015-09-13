@@ -1,0 +1,86 @@
+---
+    - name: install keys
+      sudo: yes
+      shell: pacman -Syy --noconfirm archlinux-keyring
+
+    - name: update system
+      sudo: yes
+      shell: pacman -Su --noconfirm
+
+    - name: install db
+      sudo: yes
+      shell: pacman-db-upgrade
+
+    - name: install system packages
+      sudo: yes
+      pacman: name={{ item }} state=present update_cache=yes
+      with_items:
+          - python2-pip
+          - sudo
+          - vim
+          - git
+          - easy-rsa
+          - openvpn
+
+    - name: symlink for python2-pip
+      sudo: yes
+      file: src=/usr/bin/pip2.7 dest=/usr/bin/pip state=link
+
+    - name: symlink for python
+      sudo: yes
+      file: src=/usr/bin/python2.7 dest=/usr/bin/python state=link
+
+    - name: setup service openvpn@server1
+      sudo: yes
+      shell: systemctl enable openvpn@server1.service
+
+    - name: create dir ccd in openvpn
+      sudo: yes
+      file: path=/etc/openvpn/ccd state=directory mode=0755
+
+    - name: create dir openvpn for logs
+      sudo: yes
+      file: path=/var/log/openvpn state=directory mode=0755
+
+    - name: create file openvpn-status
+      sudo: yes
+      file: path=/var/log/openvpn/openvpn-status.log state=touch mode="u=rw,g=r,o=r"
+
+    - name: create file openvpn.log
+      sudo: yes  
+      file: path=/var/log/openvpn/openvpn.log state=touch mode="u=rw,g=r,o=r"
+
+    - name: copy ccd config for user
+      sudo: yes  
+      copy: src=papa_dacha dest=/etc/openvpn/ccd/papa_dacha 
+     
+    - name: automatic activate module tun
+      sudo: yes  
+      copy: src=tun.conf dest=/etc/modules-load.d/tun.conf
+
+    - name: copy server1 config
+      sudo: yes 
+      copy: src=server1.conf dest=/etc/openvpn/server1.conf 
+    
+    - name: copy server1 cert
+      sudo: yes 
+      copy: src=server1.crt dest=/etc/openvpn/server1.crt mode=0600
+    
+    - name: copy server key
+      sudo: yes 
+      copy: src=server1.key dest=/etc/openvpn/server1.key mode=0600
+    
+    - name: copy dh cert
+      sudo: yes 
+      copy: src=dh2048.pem dest=/etc/openvpn/dh2048.pem mode=0600
+    
+    - name: copy ca cert
+      sudo: yes 
+      copy: src=ca.crt dest=/etc/openvpn/ca.crt mode=0600
+    
+    - name: reboot
+      sudo: yes 
+      shell: shutdown -r now
+
+    
+
